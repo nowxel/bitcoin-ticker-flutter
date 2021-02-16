@@ -1,5 +1,7 @@
 import 'package:bitcoin_ticker/coin_data.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -9,19 +11,47 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
 
-  List <DropdownMenuItem> getDropDownItems () {
+  DropdownButton<String> androidDownButton() {
+
     List<DropdownMenuItem<String>> dropdawnItems = [];
     for (String currency in currenciesList) {
-      var newItem = DropdownMenuItem(child: Text(currency), value: currency,);
+      var newItem = DropdownMenuItem(
+        child: Text(currency),
+        value: currency,
+      );
       dropdawnItems.add(newItem);
     }
-    return dropdawnItems;
+
+    return DropdownButton<String>(
+        value: selectedCurrency,
+        items: dropdawnItems, onChanged: (value) {
+          setState(() {
+            selectedCurrency = value;
+          });
+        },
+    );
+  }
+
+  CupertinoPicker iOSPicker() {
+
+    List<Text> pickerItems = [];
+    for (String currency in currenciesList) {
+
+      pickerItems.add(Text(currency));
+    }
+
+    return CupertinoPicker(
+      backgroundColor: Colors.lightBlue,
+      itemExtent: 32,
+      onSelectedItemChanged: (selectedIndex){
+      print(selectedIndex);
+    },
+      children: pickerItems,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    getDropDownItems();
 
     return Scaffold(
       appBar: AppBar(
@@ -57,17 +87,11 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: DropdownButton<String>(
-              value: selectedCurrency,
-                items: getDropDownItems(), onChanged: (value) {
-                  setState(() {
-                    selectedCurrency = value;
-                  });
-            },
-            ),
+            child: Platform.isIOS ? iOSPicker() : androidDownButton(),
           ),
         ],
       ),
     );
   }
 }
+
